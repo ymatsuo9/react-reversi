@@ -58,11 +58,20 @@ ol, ul {
   background: #fff;
 }
 
-.game {
-  display: flex;
-  flex-direction: row;
+.game-info {
+  margin-top: 10px;
+  margin-left: 0;
+  max-width: 126px;
 }
 
-.game-info {
-  margin-left: 20px;
+@media (min-width: 480px) {
+  .game {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .game-info {
+    margin-top: 0;
+    margin-left: 20px;
+  }
 }
