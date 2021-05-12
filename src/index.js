@@ -98,6 +98,9 @@ class Game extends React.Component {
       }],
       stepNumber: 0,
       blackIsNext: true,
+      isPlaying: false,
+      isSingleMode: false,
+      isCpuBlack: (Math.random() > 0.5)
     };
   }
 
@@ -115,12 +118,22 @@ class Game extends React.Component {
   }
 
   handleClick(x, y) {
+    if (!this.state.isPlaying) {
+      return;
+    }
+
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     let squares = copy2dArray(current.squares);
     if (squares[y][x][IS_BLACK] || squares[y][x][IS_WHITE]) {
       return;
     }
+
+    if (this.state.isSingleMode &&
+      (this.state.isCpuBlack === this.state.blackIsNext)) {
+        // CPU is thinking.
+        return;
+      }
 
     const selectableCells = getSelectableCells(squares, this.state.blackIsNext);
     let selectedCell = undefined;
@@ -133,6 +146,25 @@ class Game extends React.Component {
     if (typeof selectedCell === 'undefined') {
       return;
     }
+
+    this.putStone(history, squares, selectedCell);
+  }
+
+  putCpuStone() {
+    const history = this.state.history.slice(0, this.state.stepNumber + 1);
+    const current = history[history.length - 1];
+    let squares = copy2dArray(current.squares);
+
+    const selectableCells = getSelectableCells(squares, this.state.blackIsNext);
+    const selectedIndex = Math.floor(Math.random() * selectableCells.size);
+    let selectedCell = selectableCells.get(Array.from(selectableCells.keys())[selectedIndex]);
+
+    this.putStone(history, squares, selectedCell);
+  }
+
+  putStone(history, squares, selectedCell) {
+    let x = selectedCell.select.x;
+    let y = selectedCell.select.y;
 
     if (this.state.blackIsNext) {
       squares[y][x][IS_BLACK] = true;
@@ -149,6 +181,7 @@ class Game extends React.Component {
     }
 
     let nextPlayer = !this.state.blackIsNext;
+    let isPlaying = true;
     const selectableCellsOpposite = getSelectableCells(squares, nextPlayer);
     if (selectableCellsOpposite.size === 0) {
       // skip
@@ -158,6 +191,7 @@ class Game extends React.Component {
       if (selectableCellsMine.size === 0) {
         // game end
         nextPlayer = undefined;
+        isPlaying = false;
       }
     }
 
@@ -167,16 +201,35 @@ class Game extends React.Component {
       }]),
       stepNumber: history.length,
       blackIsNext: nextPlayer,
+      isPlaying: isPlaying,
     });
   }
 
-  restart() {
+  startSingle() {
+    let isCpuBlack = (Math.random() > 0.5);
+
     this.setState({
       history: [{
         squares: this.createSquares(),
       }],
       stepNumber: 0,
       blackIsNext: true,
+      isPlaying: true,
+      isSingleMode: true,
+      isCpuBlack: isCpuBlack,
+    })
+  }
+
+  startMulti() {
+    this.setState({
+      history: [{
+        squares: this.createSquares(),
+      }],
+      stepNumber: 0,
+      blackIsNext: true,
+      isPlaying: true,
+      isSingleMode: false,
+      isCpuBlack: false,
     })
   }
 
@@ -199,7 +252,8 @@ class Game extends React.Component {
     let whiteStoneCountMessage = 'White: ' + String(whiteStoneCount);
 
     let status;
-    let move;
+    let btnStartSingle;
+    let btnStartMulti;
     if (typeof this.state.blackIsNext === 'undefined') {
       if (blackStoneCount > whiteStoneCount) {
         status = 'Winner: Black';
@@ -208,11 +262,17 @@ class Game extends React.Component {
       } else {
         status = 'Draw';
       }
-      move = (
-        <button onClick={() => this.restart()}>restart</button>
-      );  
     } else {
-      status = 'Next player: ' + (this.state.blackIsNext ? 'Black' : 'White');
+      status = 'Next player: ' + (this.state.blackIsNext ? 'Black' : 'White') + (this.state.isSingleMode ? ((this.state.isCpuBlack === this.state.blackIsNext) ? ' (CPU)' : '') : '');
+    }
+
+    if (!this.state.isPlaying) {
+      btnStartSingle = (
+        <button className='controller' onClick={() => this.startSingle()}>Start (Single)</button>
+      );  
+      btnStartMulti = (
+        <button className='controller' onClick={() => this.startMulti()}>Start (Multi)</button>
+      );  
     }
 
     return (
@@ -227,10 +287,18 @@ class Game extends React.Component {
           <div>{status}</div>
           <div>{blackStoneCountMessage}</div>
           <div>{whiteStoneCountMessage}</div>
-          <div>{move}</div>
+          <div>{btnStartSingle}</div>
+          <div>{btnStartMulti}</div>
         </div>
       </div>
     );
+  }
+
+  componentDidUpdate() {
+    if (this.state.isSingleMode &&
+      (this.state.isCpuBlack === this.state.blackIsNext)) {
+        setTimeout((() => {this.putCpuStone();}), 1000);
+      }
   }
 }
 
@@ -370,6 +438,7 @@ function appendSelectableCells(squares, blackSelectableCells, whiteSelectableCel
         isWhiteToBlack = true;
         isWhiteFound = false;
         isBlackToWhite = false;
+        targetCells = [];
       }
       if (isWhiteToBlack) {
         targetCells.push([column, row]);
@@ -380,6 +449,7 @@ function appendSelectableCells(squares, blackSelectableCells, whiteSelectableCel
         isBlackToWhite = true;
         isBlackFound = false;
         isWhiteToBlack = false;
+        targetCells = [];
       }
       if (isBlackToWhite) {
         targetCells.push([column, row]);

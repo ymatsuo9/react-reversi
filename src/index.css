@@ -61,7 +61,7 @@ ol, ul {
 .game-info {
   margin-top: 10px;
   margin-left: 0;
-  max-width: 126px;
+  max-width: 168px;
 }
 
 @media (min-width: 480px) {
@@ -74,4 +74,9 @@ ol, ul {
     margin-top: 0;
     margin-left: 20px;
   }
+}
+
+.controller {
+  width: 100px;
+  margin-top: 10px;
 }
