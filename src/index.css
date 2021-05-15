@@ -7,6 +7,10 @@ ol, ul {
   padding-left: 30px;
 }
 
+.game-board {
+  position: relative;
+}
+
 .board-row:after {
   clear: both;
   content: "";
@@ -79,4 +83,41 @@ ol, ul {
 .controller {
   width: 100px;
   margin-top: 10px;
+}
+
+.pass {
+  position: absolute;
+  top: 120px;
+  left: 70px;
+  font-size: 36px;
+  height: 40px;
+  width: 140px;
+  line-height: 40px;
+  text-align: center;
+  border-radius: 5px;
+  background: #fff;
+  visibility: collapse;
+}
+
+.pass-popup {
+  animation: changeColor 1s linear;
+}
+
+@keyframes changeColor {
+  0% {
+    opacity: 0;
+    visibility: visible;
+  }
+
+  5% {
+    opacity: 1;
+  }
+
+  30% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
 }

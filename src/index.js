@@ -100,7 +100,8 @@ class Game extends React.Component {
       blackIsNext: true,
       isPlaying: false,
       isSingleMode: false,
-      isCpuBlack: (Math.random() > 0.5)
+      isCpuBlack: (Math.random() > 0.5),
+      blackIsPassed: undefined,
     };
   }
 
@@ -182,6 +183,7 @@ class Game extends React.Component {
 
     let nextPlayer = !this.state.blackIsNext;
     let isPlaying = true;
+    let blackIsPassed = undefined;
     const selectableCellsOpposite = getSelectableCells(squares, nextPlayer);
     if (selectableCellsOpposite.size === 0) {
       // skip
@@ -192,6 +194,8 @@ class Game extends React.Component {
         // game end
         nextPlayer = undefined;
         isPlaying = false;
+      } else {
+        blackIsPassed = !this.state.blackIsNext;
       }
     }
 
@@ -202,6 +206,7 @@ class Game extends React.Component {
       stepNumber: history.length,
       blackIsNext: nextPlayer,
       isPlaying: isPlaying,
+      blackIsPassed: blackIsPassed,
     });
   }
 
@@ -217,6 +222,7 @@ class Game extends React.Component {
       isPlaying: true,
       isSingleMode: true,
       isCpuBlack: isCpuBlack,
+      blackIsPassed: undefined,
     })
   }
 
@@ -230,6 +236,7 @@ class Game extends React.Component {
       isPlaying: true,
       isSingleMode: false,
       isCpuBlack: false,
+      blackIsPassed: undefined,
     })
   }
 
@@ -254,6 +261,9 @@ class Game extends React.Component {
     let status;
     let btnStartSingle;
     let btnStartMulti;
+    let pass = (
+      <div className="pass">Pass</div>
+    );
     if (typeof this.state.blackIsNext === 'undefined') {
       if (blackStoneCount > whiteStoneCount) {
         status = 'Winner: Black';
@@ -282,6 +292,7 @@ class Game extends React.Component {
             squares={current.squares}
             onClick={(x, y) => this.handleClick(x, y)}
           />
+          <div>{pass}</div>
         </div>
         <div className="game-info">
           <div>{status}</div>
@@ -295,6 +306,18 @@ class Game extends React.Component {
   }
 
   componentDidUpdate() {
+    if (typeof this.state.blackIsPassed !== 'undefined') {
+      setTimeout((() => {
+        const passArea = document.querySelector('.pass');
+        passArea.classList.add('pass-popup');
+
+        setTimeout(() => {
+          passArea.classList.remove('pass-popup');
+        }, 1000);
+        // alert((!this.state.blackIsNext ? 'Black' : 'White') + ' Pass');
+      }), 300);
+    }
+
     if (this.state.isSingleMode &&
       (this.state.isCpuBlack === this.state.blackIsNext)) {
         setTimeout((() => {this.putCpuStone();}), 1000);
