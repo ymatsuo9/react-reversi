@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.css": "/react-reversi/static/css/main.cb42afa6.chunk.css",
-    "main.js": "/react-reversi/static/js/main.881ce77b.chunk.js",
-    "main.js.map": "/react-reversi/static/js/main.881ce77b.chunk.js.map",
+    "main.css": "/react-reversi/static/css/main.80373239.chunk.css",
+    "main.js": "/react-reversi/static/js/main.c5512cf6.chunk.js",
+    "main.js.map": "/react-reversi/static/js/main.c5512cf6.chunk.js.map",
     "runtime-main.js": "/react-reversi/static/js/runtime-main.102c9352.js",
     "runtime-main.js.map": "/react-reversi/static/js/runtime-main.102c9352.js.map",
     "static/js/2.6adfb78d.chunk.js": "/react-reversi/static/js/2.6adfb78d.chunk.js",
     "static/js/2.6adfb78d.chunk.js.map": "/react-reversi/static/js/2.6adfb78d.chunk.js.map",
     "index.html": "/react-reversi/index.html",
-    "static/css/main.cb42afa6.chunk.css.map": "/react-reversi/static/css/main.cb42afa6.chunk.css.map",
+    "static/css/main.80373239.chunk.css.map": "/react-reversi/static/css/main.80373239.chunk.css.map",
     "static/js/2.6adfb78d.chunk.js.LICENSE.txt": "/react-reversi/static/js/2.6adfb78d.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.102c9352.js",
     "static/js/2.6adfb78d.chunk.js",
-    "static/css/main.cb42afa6.chunk.css",
-    "static/js/main.881ce77b.chunk.js"
+    "static/css/main.80373239.chunk.css",
+    "static/js/main.c5512cf6.chunk.js"
   ]
 }
