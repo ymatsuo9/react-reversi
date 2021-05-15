@@ -100,6 +100,7 @@ class Game extends React.Component {
       blackIsNext: true,
       isPlaying: false,
       isSingleMode: false,
+      cpuLevel: 2,
       isCpuBlack: (Math.random() > 0.5),
       blackIsPassed: undefined,
     };
@@ -156,11 +157,58 @@ class Game extends React.Component {
     const current = history[history.length - 1];
     let squares = copy2dArray(current.squares);
 
-    const selectableCells = getSelectableCells(squares, this.state.blackIsNext);
-    const selectedIndex = Math.floor(Math.random() * selectableCells.size);
-    let selectedCell = selectableCells.get(Array.from(selectableCells.keys())[selectedIndex]);
-
+    let selectedCell = this.selectCpuCell(this.state.cpuLevel, squares, this.state.blackIsNext);
+    
     this.putStone(history, squares, selectedCell);
+  }
+  
+  selectCpuCell(cpuLevel, squares, blackIsNext) {
+    let selectedCell = undefined;
+    const selectableCells = getSelectableCells(squares, blackIsNext);
+
+    if (cpuLevel === 1) {
+      selectedCell = this.selectCpuCellLv1(selectableCells);
+    } else if (cpuLevel === 2) {
+      selectedCell = this.selectCpuCellLv2(selectableCells);
+    }
+
+    return selectedCell;
+  }
+
+  selectCpuCellLv1(selectableCells) {
+    const selectedIndex = Math.floor(Math.random() * selectableCells.size);
+    return selectableCells.get(Array.from(selectableCells.keys())[selectedIndex]);
+  }
+
+  selectCpuCellLv2(selectableCells) {
+    const keyArray = Array.from(selectableCells.keys());
+    const cornerKeys = keyArray.filter(function(key) {
+      return (
+        (key === '0-0') || (key === '0-7') ||
+        (key === '7-0') || (key === '7-7')
+      );
+    });
+
+    if (cornerKeys.length > 0) {
+      const selectedIndex = Math.floor(Math.random() * cornerKeys.length);
+      return selectableCells.get(cornerKeys[selectedIndex]);
+    }
+    
+    const centerKeys = keyArray.filter(function(key) {
+      return (
+        (key !== '0-1') && (key !== '1-0') && (key !== '1-1') &&
+        (key !== '0-6') && (key !== '1-6') && (key !== '1-7') &&
+        (key !== '6-0') && (key !== '6-1') && (key !== '7-1') &&
+        (key !== '6-6') && (key !== '6-7') && (key !== '7-6')
+      );
+    });
+
+    if (centerKeys.length > 0) {
+      const selectedIndex = Math.floor(Math.random() * centerKeys.length);
+      return selectableCells.get(centerKeys[selectedIndex]);
+    }
+
+    return this.selectCpuCellLv1(selectableCells);
   }
 
   putStone(history, squares, selectedCell) {
@@ -210,7 +258,7 @@ class Game extends React.Component {
     });
   }
 
-  startSingle() {
+  startSingle(cpuLevel) {
     let isCpuBlack = (Math.random() > 0.5);
 
     this.setState({
@@ -221,6 +269,7 @@ class Game extends React.Component {
       blackIsNext: true,
       isPlaying: true,
       isSingleMode: true,
+      cpuLevel: cpuLevel,
       isCpuBlack: isCpuBlack,
       blackIsPassed: undefined,
     })
@@ -235,6 +284,7 @@ class Game extends React.Component {
       blackIsNext: true,
       isPlaying: true,
       isSingleMode: false,
+      cpuLevel: 1,
       isCpuBlack: false,
       blackIsPassed: undefined,
     })
@@ -259,7 +309,8 @@ class Game extends React.Component {
     let whiteStoneCountMessage = 'White: ' + String(whiteStoneCount);
 
     let status;
-    let btnStartSingle;
+    let btnStartSingleLv1;
+    let btnStartSingleLv2;
     let btnStartMulti;
     let pass = (
       <div className="pass">Pass</div>
@@ -273,12 +324,15 @@ class Game extends React.Component {
         status = 'Draw';
       }
     } else {
-      status = 'Next player: ' + (this.state.blackIsNext ? 'Black' : 'White') + (this.state.isSingleMode ? ((this.state.isCpuBlack === this.state.blackIsNext) ? ' (CPU)' : '') : '');
+      status = 'Next player: ' + (this.state.blackIsNext ? 'Black' : 'White') + ((this.state.isSingleMode && (this.state.isCpuBlack === this.state.blackIsNext) ? (' (CPU)') : ''));
     }
 
     if (!this.state.isPlaying) {
-      btnStartSingle = (
-        <button className='controller' onClick={() => this.startSingle()}>Start (Single)</button>
+      btnStartSingleLv1 = (
+        <button className='controller' onClick={() => this.startSingle(1)}>Start (CPU Lv1)</button>
+      );  
+      btnStartSingleLv2 = (
+        <button className='controller' onClick={() => this.startSingle(2)}>Start (CPU Lv2)</button>
       );  
       btnStartMulti = (
         <button className='controller' onClick={() => this.startMulti()}>Start (Multi)</button>
@@ -298,7 +352,8 @@ class Game extends React.Component {
           <div>{status}</div>
           <div>{blackStoneCountMessage}</div>
           <div>{whiteStoneCountMessage}</div>
-          <div>{btnStartSingle}</div>
+          <div>{btnStartSingleLv1}</div>
+          <div>{btnStartSingleLv2}</div>
           <div>{btnStartMulti}</div>
         </div>
       </div>
